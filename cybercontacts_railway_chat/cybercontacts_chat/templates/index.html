@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Cyber Contacts — Agenda</title>
+</head>
+<body class="body-index">
+   <nav class="navbar">
+    <span class="nav-logo"><span class="cyan">Cyber</span><span class="magenta">Contacts</span></span>
+     <div class="nav-right">
+        <span class="nav-status">● SISTEMA ACTIVO</span>
+        <a href="{{ url_for('logout') }}" class="btn-logout">⏻ Salir</a>
+     </div>
+   </nav>
+
+   <div class="barra-acciones">
+        <div class="barra-izq">
+            <input type="text" id="buscador" class="input-buscar" placeholder="🔍 Buscar por nombre, teléfono o correo...">
+            <button type="button" class="btn-cyan" id="btnBuscar">Buscar</button>
+            <button type="button" class="btn-magenta" id="btnAgregar">+ Agregar</button>
+            <a href="{{ url_for('reporte') }}" class="btn-dark">Reporte</a>
+        </div>
+        <span class="orden">A-Z</span>
+   </div>
+
+   <div class="tabla-wrapper">
+        <table class="tabla-contactos" id="tablaContactos">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Correo electrónico</th>
+                    <th>Tipo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in contactos %}
+                <tr class="fila-contacto"
+                    data-id="{{ c.id }}"
+                    data-nombre="{{ c.nombre }}"
+                    data-apellidos="{{ c.apellidos }}"
+                    data-telefono="{{ c.telefono }}"
+                    data-email="{{ c.email }}"
+                    data-tipo="{{ c.tipo }}"
+                    data-notas="{{ c.notas or '' }}"
+                    data-favorito="{{ 'True' if c.favorito else 'False' }}">
+                    <td>{{ c.nombre }} {{ c.apellidos }}</td>
+                    <td>{{ c.telefono }}</td>
+                    <td>{{ c.email }}</td>
+                    <td>
+                        {% if c.tipo == 'Favorito' %}
+                        <span class="badge badge-favorito">★ FAVORITO</span>
+                        {% else %}
+                        <span class="badge badge-general">GENERAL</span>
+                        {% endif %}
+                    </td>
+                    <td class="acciones">
+                       <button type="button" class="btn-accion editar" data-accion="editar">Editar</button>
+                       <button type="button" class="btn-accion eliminar" data-accion="eliminar">Eliminar</button>
+                       {% if c.chat_usuario_id %}
+                       <a href="{{ url_for('chat', otro_id=c.chat_usuario_id) }}" class="btn-accion chatear" title="{{ c.chat_usuario_nombre }} tiene cuenta — chatear">💬 Chat</a>
+                       {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="sin-contactos">Sin contactos registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+   </div>
+
+   <!-- ===== MODAL: AGREGAR CONTACTO ===== -->
+   <div class="modal-overlay" id="modalAgregar">
+        <div class="modal-card modal-cyan">
+            <div class="modal-header">
+                <h2>⊕ Agregar Contacto</h2>
+                <p class="modal-subtitulo">Nuevo registro al sistema</p>
+            </div>
+            <form method="POST" action="{{ url_for('nuevo_contacto') }}" class="form-contacto" id="formAgregar">
+                <p class="error-modal" id="errorAgregar"></p>
+                <div class="form-grid">
+                    <div class="campo-modal">
+                        <label>Nombre *</label>
+                        <input type="text" name="nombre" required>
+                    </div>
+                    <div class="campo-modal">
+                        <label>Apellidos *</label>
+                        <input type="text" name="apellidos" required>
+                    </div>
+                </div>
+                <div class="campo-modal">
+                    <label>Correo electrónico *</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-grid">
+                    <div class="campo-modal">
+                        <label>Teléfono *</label>
+                        <input type="text" name="telefono" required>
+                    </div>
+                    <div class="campo-modal">
+                        <label>Tipo de contacto</label>
+                        <select name="tipo" class="select-tipo">
+                            <option value="General">General</option>
+                            <option value="Favorito">Favorito</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="campo-modal">
+                    <label>Descripción / Notas</label>
+                    <input type="text" name="notas">
+                </div>
+                <div class="campo-favorito">
+                    <label>Marcar como favorito</label>
+                    <label class="toggle">
+                        <input type="checkbox" name="favorito" class="check-favorito">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-dark btn-cerrar-modal">Cancelar</button>
+                    <button type="submit" class="btn-cyan">✔ Guardar contacto</button>
+                </div>
+            </form>
+        </div>
+   </div>
+
+   <!-- ===== MODAL: EDITAR CONTACTO ===== -->
+   <div class="modal-overlay" id="modalEditar">
+        <div class="modal-card modal-magenta">
+            <div class="modal-header">
+                <h2 class="magenta-text">✎ Editar Contacto</h2>
+                <p class="modal-subtitulo" id="editarSubtitulo">—</p>
+            </div>
+            <form method="POST" id="formEditar" class="form-contacto">
+                <p class="error-modal" id="errorEditar"></p>
+                <div class="form-grid">
+                    <div class="campo-modal">
+                        <label>Nombre *</label>
+                        <input type="text" name="nombre" id="editNombre" required>
+                    </div>
+                    <div class="campo-modal">
+                        <label>Apellidos *</label>
+                        <input type="text" name="apellidos" id="editApellidos" required>
+                    </div>
+                </div>
+                <div class="campo-modal">
+                    <label>Correo electrónico *</label>
+                    <input type="email" name="email" id="editEmail" required>
+                </div>
+                <div class="form-grid">
+                    <div class="campo-modal">
+                        <label>Teléfono *</label>
+                        <input type="text" name="telefono" id="editTelefono" required>
+                    </div>
+                    <div class="campo-modal">
+                        <label class="magenta-text">Tipo de contacto</label>
+                        <select name="tipo" id="editTipo" class="select-tipo select-magenta">
+                            <option value="General">General</option>
+                            <option value="Favorito">Favorito</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="campo-modal">
+                    <label>Notas</label>
+                    <input type="text" name="notas" id="editNotas">
+                </div>
+                <div class="campo-favorito">
+                    <label>Favorito</label>
+                    <label class="toggle toggle-magenta">
+                        <input type="checkbox" name="favorito" id="editFavorito">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-dark btn-cerrar-modal">Cancelar</button>
+                    <button type="submit" class="btn-magenta">✔ Actualizar</button>
+                </div>
+            </form>
+        </div>
+   </div>
+
+   <!-- ===== MODAL: ELIMINAR CONTACTO ===== -->
+   <div class="modal-overlay" id="modalEliminar">
+        <div class="modal-card modal-rojo">
+            <div class="modal-header modal-header-rojo">
+                <h2 class="rojo-text">⚠ Eliminar Contacto</h2>
+                <p class="modal-subtitulo">Esta acción no puede deshacerse</p>
+            </div>
+            <div class="modal-body">
+                <p>¿Seguro que deseas eliminar a:</p>
+                <div class="preview-contacto">
+                    <strong id="delNombre">—</strong>
+                    <span id="delDetalle">—</span>
+                </div>
+            </div>
+            <form method="POST" id="formEliminar">
+                <div class="modal-footer">
+                    <button type="button" class="btn-dark btn-cerrar-modal">No, cancelar</button>
+                    <button type="submit" class="btn-rojo">Sí, eliminar</button>
+                </div>
+            </form>
+        </div>
+   </div>
+
+   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

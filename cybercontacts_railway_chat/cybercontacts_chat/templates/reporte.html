@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Cyber Contacts — Reporte</title>
+</head>
+<body class="body-reporte">
+
+    <nav class="reporte-top">
+        <a href="{{ url_for('inicio') }}" class="link-volver">← Volver</a>
+        <h1 class="reporte-titulo">Reporte general del sistema</h1>
+        <div class="reporte-meta">
+            <span>Generado: {{ fecha_generado }} · {{ hora_generado }}</span>
+            <a href="{{ url_for('exportar_reporte') }}" class="btn-cyan">Exportar</a>
+        </div>
+    </nav>
+
+    <div class="stats-grid">
+        <div class="stat-card stat-cyan">
+            <span class="stat-label">Total contactos</span>
+            <span class="stat-valor">{{ total }}</span>
+        </div>
+        <div class="stat-card stat-magenta">
+            <span class="stat-label">Favoritos</span>
+            <span class="stat-valor">{{ cantidad_favoritos }}</span>
+        </div>
+        <div class="stat-card stat-gris">
+            <span class="stat-label">Generales</span>
+            <span class="stat-valor">{{ cantidad_generales }}</span>
+        </div>
+        <div class="stat-card stat-amarillo">
+            <span class="stat-label">Nuevos hoy</span>
+            <span class="stat-valor">{{ nuevos_hoy }}</span>
+        </div>
+    </div>
+
+    <div class="reporte-body">
+        <div class="reporte-col">
+            <h2 class="reporte-subtitulo cyan">★ Contactos favoritos</h2>
+            <div class="lista-favoritos">
+                {% for f in favoritos %}
+                <div class="favorito-item">
+                    <div>
+                        <strong>{{ f[1] }} {{ f[2] }}</strong>
+                        <span>{{ f[3] }}</span>
+                    </div>
+                    <span class="dot-cyan"></span>
+                </div>
+                {% else %}
+                <p class="sin-contactos">Aún no tenés contactos favoritos</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="reporte-col">
+            <h2 class="reporte-subtitulo magenta">Distribución por tipo</h2>
+
+            <div class="barra-stat">
+                <span class="barra-label">Favoritos</span>
+                <div class="barra-fondo">
+                    <div class="barra-relleno barra-cyan" style="width: {{ pct_favoritos }}%;"></div>
+                </div>
+                <span class="barra-num cyan">{{ cantidad_favoritos }} <small>contactos</small></span>
+            </div>
+
+            <div class="barra-stat">
+                <span class="barra-label">Generales</span>
+                <div class="barra-fondo">
+                    <div class="barra-relleno barra-magenta" style="width: {{ pct_generales }}%;"></div>
+                </div>
+                <span class="barra-num magenta">{{ cantidad_generales }} <small>contactos</small></span>
+            </div>
+
+            <div class="total-general">{{ total }} contactos registrados en el sistema</div>
+        </div>
+    </div>
+
+    <footer class="reporte-footer">
+        <span>CyberContacts · Sistema de gestión · Cotepecos 2026</span>
+    </footer>
+
+</body>
+</html>

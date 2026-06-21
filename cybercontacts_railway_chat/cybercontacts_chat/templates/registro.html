@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Cyber Contacts</title>
+</head>
+<body>
+    <div class="cyber-wrapper">
+        <div class="cyber-card">
+
+            <!-- Esquinas decorativas -->
+            <span class="corner top-left"></span>
+            <span class="corner top-right"></span>
+            <span class="corner bottom-left"></span>
+            <span class="corner bottom-right"></span>
+
+            <!-- Título -->
+            <h1>
+                <span class="cyan">Cyber</span>
+                <span class="magenta">Contacts</span>
+            </h1>
+            <p class="subtitulo">Sistema de Gestión · Cotepecos</p>
+
+            <!-- Formulario -->
+            <form method="POST" action="{{ url_for('registro') }}">
+
+                <!-- Mostrar error si hay -->
+                {% if error %}
+                <p class="error">{{ error }}</p>
+                {% endif %}
+
+                <div class="campo">
+                    <label for="usuario">Crea un usuario</label>
+                    <input type="text" name="usuario" id="usuario" placeholder="Ingresá tu usuario" autocomplete="off">
+                </div>
+
+                <div class="campo">
+                    <label for="telefono">Número de teléfono</label>
+                    <input type="text" name="telefono" id="telefono" placeholder="8800-0000" autocomplete="off">
+                </div>
+
+                <div class="campo">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" name="contrasena" id="contrasena" placeholder="••••••••">
+                </div>
+
+                <p class="restringido">
+                    ¿Ya tenés cuenta? <a href="{{ url_for('login') }}">Iniciar Sesión</a>
+                </p>
+                <button type="submit">▶ Crear cuenta</button>
+
+            </form>
+
+            <!-- Texto restringido -->
+            <div class="divider"></div>
+            <p class="restringido">Acceso Restringido · Solo Personal Autorizado</p>
+
+        </div>
+
+        <!-- Footer -->
+        <p class="footer">CTP Educación Comercial y de Servicios · 2026</p>
+    </div>
+</body>
+</html>   

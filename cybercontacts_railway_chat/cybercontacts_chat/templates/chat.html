@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <title>Cyber Contacts — Chat con {{ otro['usuario'] }}</title>
+</head>
+<body class="body-chat">
+
+    <nav class="chat-top">
+        <a href="{{ url_for('inicio') }}" class="link-volver">← Volver</a>
+        <span class="chat-titulo">{{ otro['usuario'] }}</span>
+        <span class="chat-status">● en línea</span>
+    </nav>
+
+    <div class="chat-mensajes" id="chatMensajes">
+        {% for m in mensajes %}
+        <div class="mensaje {{ 'mensaje-propio' if m['remitente_id'] == mi_id else 'mensaje-otro' }}">
+            <p>{{ m['contenido'] }}</p>
+            <span class="mensaje-hora">{{ m['fecha_hora'] }}</span>
+        </div>
+        {% else %}
+        <p class="sin-contactos">Todavía no hay mensajes. ¡Escribí el primero!</p>
+        {% endfor %}
+    </div>
+
+    <form class="chat-input-bar" id="formChat">
+        <input type="text" id="inputMensaje" placeholder="Escribí un mensaje..." autocomplete="off" maxlength="500">
+        <button type="submit" class="btn-cyan">Enviar</button>
+    </form>
+
+    <script>
+        const MI_ID = {{ mi_id }};
+        const OTRO_ID = {{ otro['id'] }};
+    </script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
