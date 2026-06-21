@@ -134,7 +134,7 @@ def inicio():
         contactos.append(item)
     db.close()
 
-    return render_template('index.html', usuarios=session['usuario'], contactos=contactos)
+    return render_template('index.html', usuarios=session['usuario'], mi_id=session['usuario_id'], contactos=contactos)
 
 
 # --- Ruta: login ---
@@ -294,6 +294,7 @@ def reporte():
 
     return render_template(
         'reporte.html',
+        mi_id=session['usuario_id'],
         total=total,
         favoritos=favoritos,
         cantidad_favoritos=cantidad_favoritos,
@@ -392,6 +393,7 @@ def socket_enviar_mensaje(data):
     payload = {
         'id': mensaje_id,
         'remitente_id': session['usuario_id'],
+        'remitente_nombre': session['usuario'],
         'destinatario_id': destinatario_id,
         'contenido': contenido,
         'fecha_hora': ahora,
